@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Bike
 # Create your views here.
 def home(request):
@@ -16,4 +17,17 @@ def bikes_index(request):
   
 def bikes_detail(request, bike_id):
   bike = Bike.objects.get(id=bike_id)
-  return render(request, 'bikes/detail.html', { 'bike': bike})
+  return render(request, 'bikes/detail.html', {
+    'bike': bike
+    })
+class BikeCreate(CreateView):
+  model = Bike
+  fields = '__all__' #['name','breed','description','age']
+  
+class BikeUpdate(UpdateView):
+  model = Bike
+  fields = ['model', 'description', 'year']
+
+class BikeDelete(DeleteView):
+  model = Bike
+  success_url = '/bikes'
