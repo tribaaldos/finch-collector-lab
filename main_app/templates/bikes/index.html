@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Bike List</h1>
+
+{% for bike in bikes %}
+<a href="{% url 'detail' bike.id %}">
+  <div class="card">
+    <div class="card-content">
+      <span class="card-title">{{ bike.brand }}</span>
+      <p>Model: {{ bike.model }}</p>
+      <p>Description: {{ bike.description }}</p>
+      <p>Year: {{ bike.year }}</p>
+      <!-- {% if bike.age > 0 %}
+        <p>Age: {{ bike.year }}</p>
+      {% else %}
+        <p>Age: Kitten</p> -->
+      {% endif %}
+    </div>
+  </div>
+{% endfor %}
+
+{% endblock %}bike
