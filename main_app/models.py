@@ -36,6 +36,10 @@ class Filling(models.Model):
   )
   #create a bike_id FK 
   bike = models.ForeignKey( Bike, on_delete=models.CASCADE)
+  
   def __str__(self):
     # Nice method for obtaining the friendly value of a Field.choice
         return f"{self.get_fuel_display()} on {self.date}"
+    
+  class Meta:
+      ordering = ['-date']

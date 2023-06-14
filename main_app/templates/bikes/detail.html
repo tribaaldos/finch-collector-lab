@@ -20,6 +20,12 @@
   </div>
   <!-- New Markup Below -->
   <div class="col s6">
+    <form action="{% url 'add_filling' bike.id %}" method="POST">
+      {% csrf_token %}
+      <!-- Render the inputs -->
+      {{ filling_form.as_p }}
+      <input type="submit" class="btn" value="Add Filling">
+    </form>
     <table class="striped">
       <thead>
         <tr><th>Date</th><th>Fuel</th></tr>
@@ -36,4 +42,19 @@
   </div>
   <!-- New Markup Above -->
 </div>
+
+<script>
+  const dateEl = document.getElementById('id_date');
+  M.Datepicker.init(dateEl, {
+    format: 'yyyy-mm-dd',
+    defaultDate: new Date(),
+    setDefaultDate: true,
+    autoClose: true
+  });
+
+  // add additional JS to initialize select below
+  const selectEl = document.getElementById('id_fuel');
+  M.FormSelect.init(selectEl);
+</script>
+
 {% endblock %}
