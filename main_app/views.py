@@ -1,8 +1,11 @@
-from django.shortcuts import render
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Bike
-from .forms import FillingForm
+import os
+import uuid
+import boto3
 from django.shortcuts import render, redirect
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView
+from .models import Bike, Toy, Photo
+from .forms import FillingForm
 # Create your views here.
 def home(request):
     return render(request, 'home.html')
@@ -46,4 +49,49 @@ def add_filling(request, bike_id):
     new_filling = form.save(commit=False)
     new_filling.bike_id = bike_id
     new_filling.save()
+  return redirect('detail', bike_id=bike_id)
+
+class ToyList(ListView):
+  model = Toy
+
+class ToyDetail(DetailView):
+  model = Toy
+
+class ToyCreate(CreateView):
+  model = Toy
+  fields = '__all__'
+
+class ToyUpdate(UpdateView):
+  model = Toy
+  fields = ['name', 'color']
+
+class ToyDelete(DeleteView):
+  model = Toy
+  success_url = '/toys'
+
+def assoc_toy(request, bike_id, toy_id):
+  Bike.objects.get(id=bike_id).toys.add(toy_id)
+  return redirect('detail', bike_id=bike_id)
+
+def unassoc_toy(request, bike_id, toy_id):
+  Bike.objects.get(id=bike_id).toys.remove(toy_id)
+  return redirect('detail', bike_id=bike_id)
+
+def add_photo(request, bike_id):
+  # photo-file maps to the "name" attr on the <input>
+  photo_file = request.FILES.get('photo-file', None)
+  if photo_file:
+    s3 = boto3.client('s3')
+    # Need a unique "key" (filename)
+    # It needs to keep the same file extension
+    # of the file that was uploaded (.png, .jpeg, etc.)
+    key = uuid.uuid4().hex[:6] + photo_file.name[photo_file.name.rfind('.'):]
+    try:
+      bucket = os.environ['S3_BUCKET']
+      s3.upload_fileobj(photo_file, bucket, key)
+      url = f"{os.environ['S3_BASE_URL']}{bucket}/{key}"
+      Photo.objects.create(url=url, bike_id=bike_id)
+    except Exception as e:
+      print('An error occurred uploading file to S3')
+      print(e)
   return redirect('detail', bike_id=bike_id)

@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from datetime import date
 
 FUELS = (
     ('D', 'Diesel'),
@@ -10,6 +11,16 @@ FUELS = (
 
 
 # Create your models here.
+class Toy(models.Model):
+  name = models.CharField(max_length=50)
+  color = models.CharField(max_length=20)
+
+  def __str__(self):
+    return self.name
+
+  def get_absolute_url(self):
+    return reverse('toys_detail', kwargs={'pk': self.id})
+  
 class Bike(models.Model):
     brand = models.CharField(max_length=100)
     model = models.CharField(max_length=100)
@@ -43,3 +54,12 @@ class Filling(models.Model):
     
   class Meta:
       ordering = ['-date']
+      
+      
+class Photo(models.Model):
+  url = models.CharField(max_length=200)
+  bike = models.ForeignKey(Bike, on_delete=models.CASCADE)
+
+  def __str__(self):
+    return f"Photo for cat_id: {self.bike_id} @{self.url}"
+      
